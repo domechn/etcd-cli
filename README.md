@@ -1,12 +1,14 @@
 # ETCD-CLI
 
-## 使用etcd-cli连接etcd服务之后，可以使用常用的linux命令来操作etcd中的数据
+[中文文档](./README_zh.md)
+
+## After connecting to the etcd service using the etcd-cli, you can use the common Linux commands to manipulate the data in the etcd
 
 ```bash
 etcd-cli -s 127.0.0.1 -p 2380
 ```
 
-### 支持命令
+### Supported commands
 
 - cd
 - ls
@@ -18,37 +20,37 @@ etcd-cli -s 127.0.0.1 -p 2380
 - pwd
 - cat
 
-（暂时不支持使用额外参数，如 -f、-r、-p等）
+`(additional parameters, such as -f, -r, -p, etc., are not supported)`
 
-**你甚至可以使用`vim`来修改etcd中可以被翻译成文本的文件**
+**you can even use `vim` to modify the etcd * * can be translated into text files**
 
-需要注意的是`rm`、`mv`、`cp`这些命令在操作时需要在后加上 **"/"**,用来区分是文件夹还是文件
+It is important to note `rm`, `mv`, `cp` these commands in operation is needed in the add **"/"**, is used to distinguish the folder or file
 
 ```bash
-# 删除整个dir文件夹
+# Delete the entire dir folder
 rm dir/
-# 删除file文件
+# Delete the file
 rm file
 ```
 
-mv、cp 同理
+The same as `cp`,`mv`
 
-### 额外支持的命令
+### Additional commands supported
 
-- upload [etcd-path] [local-path] 上传本地**文件**到etc指定的路径
-- download [etcd-path] [local-path] 下载etcd中指定的**文件**到本地
+- upload [etcd-path] [local-path] Upload local **files** to the path specified by etc
+- download [etcd-path] [local-path] Download the **file** specified in the etcd to local
 
-如果在连接状态下使用upload或者download，local-path需要写绝对路径
+If you are using upload or download in the connection state, the local-path needs to write the absolute path
 
-也可以直接使用etcd-cli，这时local-path可以使用相对路径
+You can also use etcd-cli directly, where local-path can use a relative path
 
 ```bash
 etcd-cli -s 127.0.0.1 -p 2380 download /etcd-path/testfile ./
 ```
 
-### 如何安装
+### How to install
 
-安装go语言环境
+First of all,install the go locale
 
 ```bash
 go get github.com/hiruok/etcd-cli
@@ -57,4 +59,4 @@ go build -o etcd-cli
 mv etcd-cli $GOPATH/bin
 ```
 
-### 请帮助完善ETCD-CLI
+### Help improve the ETCD-CLI
