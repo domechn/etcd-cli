@@ -8,19 +8,30 @@ etcd-cli -s 127.0.0.1 -p 2380
 
 ### 支持命令
 
-- cd [path]
-- ls [path]
-- mkdir [path]
-- touch [path]
-- rm [path] [path] ...
-- mv [source] [target]
-- cp [source] [target]
+- cd
+- ls
+- mkdir
+- touch
+- rm
+- mv
+- cp
 - pwd
-- cat [path]
+- cat
+
+（暂时不支持使用额外参数，如 -f、-r、-p等）
 
 **你甚至可以使用`vim`来修改etcd中可以被翻译成文本的文件**
 
 需要注意的是`rm`、`mv`、`cp`这些命令在操作时需要在后加上 **"/"**,用来区分是文件夹还是文件
+
+```bash
+# 删除整个dir文件夹
+rm dir/
+# 删除file文件
+rm file
+```
+
+mv、cp 同理
 
 ### 额外支持的命令
 
