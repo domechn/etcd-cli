@@ -40,7 +40,7 @@ mv、cp 同理
 
 如果在连接状态下使用upload或者download，local-path需要写绝对路径
 
-也可以直接使用etcd-cli，这是local-path可以使用相对路径
+也可以直接使用etcd-cli，这时local-path可以使用相对路径
 
 ```bash
 etcd-cli -s 127.0.0.1 -p 2380 download /etcd-path/testfile ./
