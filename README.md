@@ -27,7 +27,7 @@ etcd-cli -s 127.0.0.1 -p 2380
 ```bash
 # 删除整个dir文件夹
 rm dir/
-# 删除file文件
+# 删除file文件
 rm file
 ```
 
