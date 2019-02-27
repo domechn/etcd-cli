@@ -20,6 +20,7 @@ import (
 
 // Touch 创建一个文件
 func (r *Root) Touch(path string) error {
+	r.CleanCache()
 	if err := r.touch(path); err != nil {
 		return fmt.Errorf("touch: %s", err.Error())
 	}

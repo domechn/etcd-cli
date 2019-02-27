@@ -20,6 +20,7 @@ import (
 
 // Move 源地址，目标地址
 func (r *Root) Move(dist, src string) error {
+	r.CleanCache()
 	if err := r.move(dist, src, true); err != nil {
 		return fmt.Errorf("mv: %s", err.Error())
 	}

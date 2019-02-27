@@ -12,6 +12,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/patrickmn/go-cache"
 	"time"
 
 	"github.com/hiruok/etcd-cli/pkg/store"
@@ -21,6 +22,8 @@ import (
 // Root 获取etcd的客户端
 type Root struct {
 	s store.Store
+
+	dirCache *cache.Cache
 }
 
 // NewRoot 根据输入参数获取etcd客户端
@@ -32,7 +35,8 @@ func NewRoot(host string, port int32) (*Root, error) {
 		return nil, err
 	}
 	r := &Root{
-		s: e,
+		s:        e,
+		dirCache: cache.New(time.Second*3, time.Second*10),
 	}
 	return r, nil
 }
@@ -43,4 +47,8 @@ func (r *Root) Close() error {
 		return r.s.Close()
 	}
 	return nil
+}
+
+func (r *Root) CleanCache() {
+	r.dirCache.Flush()
 }

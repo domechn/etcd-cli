@@ -19,6 +19,7 @@ import (
 
 // Mkdir 创建文件夹
 func (r *Root) Mkdir(path string) error {
+	r.CleanCache()
 	if err := r.mkdir(path); err != nil {
 		return fmt.Errorf("mkdir: %s", err.Error())
 	}

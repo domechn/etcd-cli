@@ -20,6 +20,7 @@ import (
 
 // Remove 删除一个文件 如果是文件夹需要在路径最后加上"/""
 func (r *Root) Remove(paths ...string) error {
+	r.CleanCache()
 	for _, p := range paths {
 		if err := r.remove(p); err != nil {
 			fmt.Println("remove: ", err.Error())

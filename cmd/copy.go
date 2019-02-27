@@ -14,6 +14,7 @@ import "fmt"
 
 // Copy 拷贝文件
 func (r *Root) Copy(dist, src string) error {
+	r.CleanCache()
 	if err := r.copy(dist, src); err != nil {
 		return fmt.Errorf("cp: %s", err.Error())
 	}

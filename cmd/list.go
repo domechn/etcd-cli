@@ -14,6 +14,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 )
 
 // List 列出当前路径或者指定路径fp下所有的文件
@@ -26,21 +27,38 @@ func (r *Root) List(fp string) error {
 
 func (r *Root) list(fp string) error {
 	fp = pathHandler(fp)
+	if names, ok := r.dirCache.Get(fp); ok {
+		printFiles(fp, names.([]string))
+		return nil
+	}
 	list, err := r.s.List(context.Background(), fp)
+	var files []string
+
 	if err != nil {
 		return err
 	}
 	if len(list) == 0 {
 		return fmt.Errorf("dir %s is not exsit", fp)
 	}
-
-	var set = make(map[string]int8, len(list))
-	var idx int
 	for _, l := range list {
+		files = append(files, l.Key)
+	}
+
+	printFiles(fp, files)
+	r.dirCache.Set(fp, files, time.Second*2)
+
+	return nil
+}
+
+func printFiles(fp string, files []string) {
+	var set = make(map[string]int8, len(files))
+	var idx int
+
+	for _, f := range files {
 		if idx != 0 && idx%8 == 0 {
 			changeLine()
 		}
-		k := pathResHandler(fp, l.Key)
+		k := pathResHandler(fp, f)
 		if k == "/" || k == "" {
 			continue
 		}
@@ -51,9 +69,7 @@ func (r *Root) list(fp string) error {
 		set[k] = 1
 		idx++
 	}
-
 	changeLine()
-	return nil
 }
 
 func pathResHandler(pwd, p string) string {
