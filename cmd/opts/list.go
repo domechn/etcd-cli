@@ -41,7 +41,7 @@ func (r *Root) list(fp string) error {
 			changeLine()
 		}
 		k := pathResHandler(fp, l.Key)
-		if k == "/" {
+		if k == "/" || k == "" {
 			continue
 		}
 		if _, ok := set[k]; ok {

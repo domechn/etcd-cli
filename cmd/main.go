@@ -11,17 +11,17 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
-	"log"
+	"github.com/peterh/liner"
 	"os"
+	"path"
+	"regexp"
 
 	"github.com/hiruok/etcd-cli/cmd/opts"
 
-	"github.com/spf13/cobra"
 	"github.com/hiruok/etcd-cli/pkg/cmd"
 	"github.com/hiruok/etcd-cli/pkg/version"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -46,8 +46,9 @@ var (
 		SilenceUsage: true,
 	}
 
-	etcdHost string
-	etcdPort int32
+	etcdHost    string
+	etcdPort    int32
+	historyPath = path.Join(os.Getenv("HOME"), ".etcdcli_history")
 )
 
 func init() {
@@ -68,23 +69,35 @@ func main() {
 }
 
 func rootE(_ *cobra.Command, _ []string) error {
+	// set line
+	line := liner.NewLiner()
+	defer line.Close()
+	line.SetCtrlCAborts(true)
+
+	// load history from file
+	loadHistory(line)
+	defer saveHistory(line)
+
 	r, err := opts.NewRoot(etcdHost, etcdPort)
 	if err != nil {
 		return err
 	}
 	defer r.Close()
-	fmt.Printf("connect %s:%d success!\n", etcdHost, etcdPort)
+
+	reg, _ := regexp.Compile(`'.*?'|".*?"|\S+`)
 	for {
-		fmt.Printf("%s:%d\t%s>", etcdHost, etcdPort, opts.PWD)
+		prompt := fmt.Sprintf("%s[%d]  %s>", etcdHost, etcdPort, opts.PWD)
 
-		bio := bufio.NewReader(os.Stdin)
-		input, _, err := bio.ReadLine()
+		c, err := line.Prompt(prompt)
+
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
-		fileds := bytes.Fields(input)
+		line.AppendHistory(c)
 
-		err = r.DoScan(fileds)
+		fields := reg.FindAllString(c, -1)
+
+		err = r.DoScan(fields)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
@@ -119,4 +132,20 @@ func downloadE(_ *cobra.Command, args []string) error {
 		localP = args[1]
 	}
 	return r.Download(args[0], localP)
+}
+
+func saveHistory(line *liner.State) {
+	if f, err := os.OpenFile(historyPath, os.O_CREATE|os.O_RDWR, 0666); err != nil {
+		fmt.Errorf("Error writing history file: %s", err.Error())
+	} else {
+		line.WriteHistory(f)
+		f.Close()
+	}
+}
+
+func loadHistory(line *liner.State) {
+	if f, err := os.OpenFile(historyPath, os.O_RDONLY, 0444); err == nil {
+		line.ReadHistory(f)
+		f.Close()
+	}
 }

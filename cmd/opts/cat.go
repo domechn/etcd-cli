@@ -41,7 +41,7 @@ func (r *Root) cat(path string) error {
 	bio := bufio.NewReader(bytes.NewReader(kv.Value))
 	var lineNum = 1
 	for {
-		line, err := bio.ReadString('\n')
+		line, _, err := bio.ReadLine()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -49,7 +49,7 @@ func (r *Root) cat(path string) error {
 				return fmt.Errorf("read file error: %v", err)
 			}
 		}
-		fmt.Printf("%3d|\t%s", lineNum, line)
+		fmt.Printf("%3d|\t%s\n", lineNum, line)
 		lineNum++
 	}
 	return nil
