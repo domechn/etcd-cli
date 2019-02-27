@@ -8,7 +8,7 @@
 #   Describe      :
 #
 # ====================================================*/
-package opts
+package cmd
 
 import (
 	"errors"

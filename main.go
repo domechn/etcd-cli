@@ -17,9 +17,9 @@ import (
 	"path"
 	"regexp"
 
-	"github.com/hiruok/etcd-cli/cmd/opts"
+	"github.com/hiruok/etcd-cli/cmd"
 
-	"github.com/hiruok/etcd-cli/pkg/cmd"
+	cmd2 "github.com/hiruok/etcd-cli/pkg/cmd"
 	"github.com/hiruok/etcd-cli/pkg/version"
 	"github.com/spf13/cobra"
 )
@@ -55,7 +55,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&etcdHost, "host", "s", "127.0.0.1", "Etcd connection host.")
 	rootCmd.PersistentFlags().Int32VarP(&etcdPort, "port", "p", 2379, "Etcd connection port.")
 
-	cmd.AddFlags(rootCmd)
+	cmd2.AddFlags(rootCmd)
 	rootCmd.AddCommand(saveCmd)
 	rootCmd.AddCommand(downloadCmd)
 	rootCmd.AddCommand(version.Command())
@@ -78,7 +78,7 @@ func rootE(_ *cobra.Command, _ []string) error {
 	loadHistory(line)
 	defer saveHistory(line)
 
-	r, err := opts.NewRoot(etcdHost, etcdPort)
+	r, err := cmd.NewRoot(etcdHost, etcdPort)
 	if err != nil {
 		return err
 	}
@@ -86,7 +86,7 @@ func rootE(_ *cobra.Command, _ []string) error {
 
 	reg, _ := regexp.Compile(`'.*?'|".*?"|\S+`)
 	for {
-		prompt := fmt.Sprintf("%s[%d]  %s>", etcdHost, etcdPort, opts.PWD)
+		prompt := fmt.Sprintf("%s[%d]  %s>", etcdHost, etcdPort, cmd.PWD)
 
 		c, err := line.Prompt(prompt)
 
@@ -107,25 +107,25 @@ func rootE(_ *cobra.Command, _ []string) error {
 }
 
 func uploadE(_ *cobra.Command, args []string) error {
-	r, err := opts.NewRoot(etcdHost, etcdPort)
+	r, err := cmd.NewRoot(etcdHost, etcdPort)
 	if err != nil {
 		return err
 	}
 	defer r.Close()
 	if len(args) != 2 {
-		return opts.ErrInvalidParamNum
+		return cmd.ErrInvalidParamNum
 	}
 	return r.Upload(args[0], args[1])
 }
 
 func downloadE(_ *cobra.Command, args []string) error {
-	r, err := opts.NewRoot(etcdHost, etcdPort)
+	r, err := cmd.NewRoot(etcdHost, etcdPort)
 	if err != nil {
 		return err
 	}
 	defer r.Close()
 	if len(args) != 2 && len(args) != 1 {
-		return opts.ErrInvalidParamNum
+		return cmd.ErrInvalidParamNum
 	}
 	var localP = "./"
 	if len(args) == 2 {
