@@ -52,9 +52,8 @@ etcd-cli -s 127.0.0.1 -p 2380 download /etcd-path/testfile ./
 
 ```bash
 go get github.com/hiruok/etcd-cli
-cd $GOPATH/src/github.com/hiruok/etcd-cli/cmd
-go build -o etcd-cli
-mv etcd-cli $GOPATH/bin
+cd $GOPATH/bin
+./etcd-cli
 ```
 
 ### 请帮助完善ETCD-CLI

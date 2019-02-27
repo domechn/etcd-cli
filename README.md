@@ -54,9 +54,8 @@ First of all,install the go locale
 
 ```bash
 go get github.com/hiruok/etcd-cli
-cd $GOPATH/src/github.com/hiruok/etcd-cli/cmd
-go build -o etcd-cli
-mv etcd-cli $GOPATH/bin
+cd $GOPATH/bin
+./etcd-cli
 ```
 
 ### Help improve the ETCD-CLI
