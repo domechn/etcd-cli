@@ -46,19 +46,24 @@ var (
 		SilenceUsage: true,
 	}
 
-	etcdHost    string
-	etcdPort    int32
+	cfg         cmd.Config
 	historyPath = path.Join(os.Getenv("HOME"), ".etcdcli_history")
 )
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&etcdHost, "host", "s", "127.0.0.1", "Etcd connection host.")
-	rootCmd.PersistentFlags().Int32VarP(&etcdPort, "port", "p", 2379, "Etcd connection port.")
+	rootCmd.PersistentFlags().StringVarP(&cfg.Host, "host", "s", "127.0.0.1", "Etcd connection host.")
+	rootCmd.PersistentFlags().Int32VarP(&cfg.Port, "port", "p", 2379, "Etcd connection port.")
+	rootCmd.PersistentFlags().StringVar(&cfg.Ca, "ca-path", "", "cafile path used to connect to an etcd.")
+	rootCmd.PersistentFlags().StringVar(&cfg.Cert, "cert-path", "", "certfile path used to connect to an etcd.")
+	rootCmd.PersistentFlags().StringVar(&cfg.Key, "key-path", "", "keyfile path used to connect to an etcd.")
+	rootCmd.PersistentFlags().StringVar(&cfg.Username, "username", "", "username used to connect to an etcd.")
+	rootCmd.PersistentFlags().StringVar(&cfg.Password, "password", "", "password used to connect to an etcd.")
 
 	cmd2.AddFlags(rootCmd)
 	rootCmd.AddCommand(saveCmd)
 	rootCmd.AddCommand(downloadCmd)
 	rootCmd.AddCommand(version.Command())
+
 }
 
 func main() {
@@ -78,7 +83,7 @@ func rootE(_ *cobra.Command, _ []string) error {
 	loadHistory(line)
 	defer saveHistory(line)
 
-	r, err := cmd.NewRoot(etcdHost, etcdPort)
+	r, err := cmd.NewRoot(cfg)
 	if err != nil {
 		return err
 	}
@@ -86,7 +91,7 @@ func rootE(_ *cobra.Command, _ []string) error {
 
 	reg, _ := regexp.Compile(`'.*?'|".*?"|\S+`)
 	for {
-		prompt := fmt.Sprintf("%s[%d]  %s>", etcdHost, etcdPort, cmd.PWD)
+		prompt := fmt.Sprintf("%s[%d]  %s>", cfg.Host, cfg.Port, cmd.PWD)
 
 		c, err := line.Prompt(prompt)
 
@@ -107,7 +112,7 @@ func rootE(_ *cobra.Command, _ []string) error {
 }
 
 func uploadE(_ *cobra.Command, args []string) error {
-	r, err := cmd.NewRoot(etcdHost, etcdPort)
+	r, err := cmd.NewRoot(cfg)
 	if err != nil {
 		return err
 	}
@@ -119,7 +124,7 @@ func uploadE(_ *cobra.Command, args []string) error {
 }
 
 func downloadE(_ *cobra.Command, args []string) error {
-	r, err := cmd.NewRoot(etcdHost, etcdPort)
+	r, err := cmd.NewRoot(cfg)
 	if err != nil {
 		return err
 	}

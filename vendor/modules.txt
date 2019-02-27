@@ -28,6 +28,8 @@ github.com/mattn/go-runewidth
 github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.1
 github.com/modern-go/reflect2
+# github.com/patrickmn/go-cache v2.1.0+incompatible
+github.com/patrickmn/go-cache
 # github.com/peterh/liner v1.1.0
 github.com/peterh/liner
 # github.com/sirupsen/logrus v1.3.0

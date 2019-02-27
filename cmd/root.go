@@ -11,7 +11,9 @@
 package cmd
 
 import (
+	"crypto/tls"
 	"fmt"
+	"github.com/hiruok/etcd-cli/pkg/tls"
 	"github.com/patrickmn/go-cache"
 	"time"
 
@@ -26,10 +28,35 @@ type Root struct {
 	dirCache *cache.Cache
 }
 
+type Config struct {
+	Host     string
+	Port     int32
+	Ca       string
+	Cert     string
+	Key      string
+	Username string
+	Password string
+}
+
 // NewRoot 根据输入参数获取etcd客户端
-func NewRoot(host string, port int32) (*Root, error) {
-	e, err := etcdstore.New([]string{fmt.Sprintf("%s:%d", host, port)}, &store.Config{
+func NewRoot(cfg Config) (*Root, error) {
+	var t *tls.Config
+	if cfg.Ca != "" && cfg.Cert != "" && cfg.Key != "" {
+		var err error
+		t, err = tlsclient.Config(tlsclient.Options{
+			CAFile:   cfg.Ca,
+			CertFile: cfg.Cert,
+			KeyFile:  cfg.Key,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+	e, err := etcdstore.New([]string{fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)}, &store.Config{
+		TLS:               t,
 		ConnectionTimeout: 10 * time.Second,
+		Username:          cfg.Username,
+		Password:          cfg.Password,
 	})
 	if err != nil {
 		return nil, err
