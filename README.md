@@ -35,6 +35,8 @@ rm file
 
 The same as `cp`,`mv`
 
+![option](./images/option.gif)
+
 ### Additional commands supported
 
 - upload [etcd-path] [local-path] Upload local **files** to the path specified by etc

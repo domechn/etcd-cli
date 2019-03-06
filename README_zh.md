@@ -33,6 +33,8 @@ rm file
 
 mv、cp 同理
 
+![option](./images/option.gif)
+
 ### 额外支持的命令
 
 - upload [etcd-path] [local-path] 上传本地**文件**到etc指定的路径
