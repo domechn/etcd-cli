@@ -59,5 +59,3 @@ go get github.com/hiruok/etcd-cli
 cd $GOPATH/bin
 ./etcd-cli
 ```
-
-### Help improve the ETCD-CLI
