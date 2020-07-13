@@ -8,7 +8,7 @@
 #   Describe      :
 #
 # ====================================================*/
-package etcdstore
+package etcd
 
 import (
 	"context"
@@ -72,56 +72,6 @@ func TestEtcd_Delete(t *testing.T) {
 		t.Error(err)
 	}
 	fmt.Println(gf.LastIndex)
-}
-
-func TestEtcd_Watch(t *testing.T) {
-	stopCh := make(chan struct{})
-	res, err := st.Watch(context.Background(), "foo2/23", stopCh)
-	if err != nil {
-		t.Error(err)
-	}
-	go func() {
-		for {
-			s, ok := <-res
-			if ok {
-				fmt.Println(string(s.KV.Value))
-
-			}
-		}
-	}()
-	time.Sleep(time.Second * 5)
-	stopCh <- struct{}{}
-}
-
-func TestEtcd_WatchTree(t *testing.T) {
-	stopCh := make(chan struct{})
-	res, err := st.WatchTree(context.Background(), "foo2", stopCh)
-	if err != nil {
-		t.Error(err)
-	}
-	go func() {
-		for {
-			s, ok := <-res
-			if ok {
-				fmt.Println(s)
-			}
-		}
-	}()
-	time.Sleep(time.Second * 5)
-	stopCh <- struct{}{}
-}
-
-func TestEtcd_NewLock(t *testing.T) {
-	lck, err := st.NewLock(DefaultLockKey, &store.LockOptions{
-		TTL: defaultLockTTL,
-	})
-	if err != nil {
-		t.Error(err)
-	}
-	lck.Lock()
-
-	lck.Unlock()
-	lck.Lock()
 }
 
 func TestEtcd_AtomicPut(t *testing.T) {

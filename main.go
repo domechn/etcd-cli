@@ -108,8 +108,6 @@ func rootE(_ *cobra.Command, _ []string) error {
 			fmt.Println(err.Error())
 		}
 	}
-
-	return nil
 }
 
 func uploadE(_ *cobra.Command, args []string) error {

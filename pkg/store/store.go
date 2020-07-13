@@ -24,15 +24,6 @@ var (
 	ErrKeyNotExsit = fmt.Errorf("key not exsit")
 )
 
-const (
-	// OptionTypeNew event type new
-	OptionTypeNew = OptType(0)
-	// OptionTypeUpdate event type update
-	OptionTypeUpdate = OptType(1)
-	// OptionTypeDelete event type delete
-	OptionTypeDelete = OptType(2)
-)
-
 // WriteOptions put操作时的属性
 type WriteOptions struct {
 	IsDir     bool
@@ -40,38 +31,11 @@ type WriteOptions struct {
 	KeepAlive bool
 }
 
-// LockOptions 锁的最长维持时间
-type LockOptions struct {
-	TTL time.Duration // Optional, expiration ttl associated with the lock
-}
-
 // KVPair 分装查询的结果
 type KVPair struct {
 	Key       string
 	Value     []byte
 	LastIndex int64
-}
-
-// WatchRes 分装watch时变化的值
-type WatchRes struct {
-	KV   KVPair
-	Type OptType
-}
-
-// Locker 分布式锁
-type Locker interface {
-	// Lock 阻塞锁
-	Lock()
-	// Unlock 释放阻塞锁
-	Unlock()
-}
-
-// NonBlockLocker 分布式非阻塞锁
-type NonBlockLocker interface {
-	// NonBlockLock 非阻塞式加锁 , 如果无法获取锁直接返回false
-	NonBlockLock() bool
-	// UnNonBlockLock 非阻塞锁解锁
-	UnNonBlockLock()
 }
 
 // Store 实现存储功能
@@ -87,18 +51,6 @@ type Store interface {
 
 	// Verify 查询存储中是否有该key
 	Exists(ctx context.Context, key string) (bool, error)
-
-	// Watch 观察一个key中的value变化
-	Watch(ctx context.Context, key string, stopCh <-chan struct{}) (<-chan *WatchRes, error)
-
-	// WatchTree 观察该文件夹下所有值的变化，每当有key变化时返回变化的值
-	WatchTree(ctx context.Context, directory string, stopCh <-chan struct{}) (<-chan *WatchRes, error)
-
-	// NewLock 创建一个分布式锁，但并没有锁住，如果需要加锁请调用.Lock()方法
-	NewLock(key string, options *LockOptions) (Locker, error)
-
-	// NewNonBlockLocker 返回一个非阻塞分布式锁
-	NewNonBlockLocker(key string, options *LockOptions) NonBlockLocker
 
 	// List 前缀为该值的所有kv
 	List(ctx context.Context, directory string) ([]*KVPair, error)

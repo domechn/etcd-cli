@@ -8,18 +8,15 @@
 #   Describe      :
 #
 # ====================================================*/
-package etcdstore
+package etcd
 
 import (
 	"context"
 	"crypto/tls"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/coreos/etcd/clientv3"
-	"github.com/coreos/etcd/clientv3/concurrency"
-	"github.com/coreos/etcd/mvcc/mvccpb"
 	"github.com/domgoer/etcd-cli/pkg/store"
 )
 
@@ -27,28 +24,6 @@ import (
 type Etcd struct {
 	client clientv3.Client
 }
-
-// etcdLock implements Locker
-type etcdLock struct {
-	client clientv3.Client
-	key    string
-	ttl    time.Duration
-	locker sync.Locker
-}
-
-type nonBlockEtcdLock struct {
-	client clientv3.Client
-	key    string
-	ttl    time.Duration
-}
-
-const (
-	periodicSync      = 5 * time.Minute  // 自动同步间隔
-	defaultLockTTL    = 20 * time.Second // 锁的默认超时时间
-	defaultUpdateTime = 5 * time.Second
-	// DefaultLockKey 锁的默认key
-	DefaultLockKey = "mutex/lock/key"
-)
 
 // New 通过给定的地址列表和tls配置，创建一个新的etcd客户端
 func New(addrs []string, options *store.Config) (*Etcd, error) {
@@ -190,124 +165,6 @@ func (s *Etcd) Exists(ctx context.Context, key string) (bool, error) {
 	return true, nil
 }
 
-// Watch 观察一个key的变化
-// 它返回一个chan可以用来接收该key的value的变化
-// 向stopch中传值可以终止watch
-func (s *Etcd) Watch(ctx context.Context, key string, stopCh <-chan struct{}) (<-chan *store.WatchRes, error) {
-	rch := s.client.Watch(ctx, s.normalize(key))
-	watchCh := make(chan *store.WatchRes)
-	go func() {
-		defer close(watchCh)
-		for {
-			select {
-			case <-stopCh:
-				return
-			case wresp := <-rch:
-				for _, ev := range wresp.Events {
-					var optType store.OptType
-					// 判断操作类型
-					switch ev.Type {
-					case mvccpb.DELETE:
-						optType = store.OptionTypeDelete
-					case mvccpb.PUT:
-						if ev.IsCreate() {
-							optType = store.OptionTypeNew
-						} else if ev.IsModify() {
-							optType = store.OptionTypeUpdate
-						}
-					}
-					watchCh <- &store.WatchRes{
-						KV: store.KVPair{
-							Key:       string(ev.Kv.Key),
-							Value:     ev.Kv.Value,
-							LastIndex: ev.Kv.ModRevision,
-						},
-						Type: optType,
-					}
-				}
-			}
-		}
-	}()
-
-	return watchCh, nil
-}
-
-// WatchTree 监视“目录”上的更改
-// 它返回一个chan可以用来接收directory下kv的变化
-// 向stopch中传值可以终止watchtree
-func (s *Etcd) WatchTree(ctx context.Context, directory string, stopCh <-chan struct{}) (<-chan *store.WatchRes, error) {
-	rch := s.client.Watch(ctx, s.normalizeDir(directory), clientv3.WithPrefix())
-	watchCh := make(chan *store.WatchRes)
-
-	go func() {
-		defer close(watchCh)
-
-		for {
-			// Check if the watch was stopped by the caller
-			select {
-			case <-stopCh:
-				return
-			case wresp := <-rch:
-				for _, ev := range wresp.Events {
-					var optType store.OptType
-					// 判断操作类型
-					switch ev.Type {
-					case mvccpb.DELETE:
-						optType = store.OptionTypeDelete
-					case mvccpb.PUT:
-						if ev.IsCreate() {
-							optType = store.OptionTypeNew
-						} else if ev.IsModify() {
-							optType = store.OptionTypeUpdate
-						}
-					}
-					watchCh <- &store.WatchRes{
-						KV: store.KVPair{
-							Key:       string(ev.Kv.Key),
-							Value:     ev.Kv.Value,
-							LastIndex: ev.Kv.ModRevision,
-						},
-						Type: optType,
-					}
-				}
-			}
-
-		}
-	}()
-
-	return watchCh, nil
-
-}
-
-// NewLock 返回一个所得结构体，可以用来锁住一个key
-func (s *Etcd) NewLock(key string, options *store.LockOptions) (store.Locker, error) {
-	ttl := defaultLockTTL
-
-	// 设置锁的过期时间
-	if options != nil {
-		if options.TTL != 0 {
-			ttl = options.TTL
-		}
-	}
-
-	// 创建一个锁的对象
-	l := &etcdLock{
-		client: s.client,
-		key:    s.normalize(key),
-		ttl:    ttl,
-	}
-
-	session, err := concurrency.NewSession(&l.client, concurrency.WithTTL(int(l.ttl.Seconds())))
-	if err != nil {
-		return nil, err
-
-	}
-	locker := concurrency.NewLocker(session, l.key)
-	l.locker = locker
-
-	return l, nil
-}
-
 // List 列出该directory下的所有kv
 func (s *Etcd) List(ctx context.Context, directory string) ([]*store.KVPair, error) {
 	var resKV []*store.KVPair
@@ -355,7 +212,7 @@ func (s *Etcd) AtomicPut(ctx context.Context, key string, value []byte, previous
 	}
 
 	resp, err := s.client.Txn(ctx).
-		If(clientv3.Compare(clientv3.ModRevision(key), "=", int64(previous.LastIndex))).
+		If(clientv3.Compare(clientv3.ModRevision(key), "=", previous.LastIndex)).
 		Then(clientv3.OpPut(key, string(value), op...)).
 		Else(clientv3.OpGet(key)).
 		Commit()
@@ -418,60 +275,4 @@ func (s *Etcd) AtomicDelete(ctx context.Context, key string, previous *store.KVP
 // Close 关闭客户端连接
 func (s *Etcd) Close() error {
 	return s.client.Close()
-}
-
-// Lock 用etc，加锁这个key
-func (l *etcdLock) Lock() {
-	l.locker.Lock()
-}
-
-// Unlock 解锁这个key.
-func (l *etcdLock) Unlock() {
-	l.locker.Unlock()
-}
-
-// NewNonBlockLocker 返回一个非阻塞分布式锁
-func (s *Etcd) NewNonBlockLocker(key string, options *store.LockOptions) store.NonBlockLocker {
-	ttl := defaultLockTTL
-
-	// 设置锁的过期时间
-	if options != nil {
-		if options.TTL != 0 {
-			ttl = options.TTL
-		}
-	}
-
-	// 创建一个锁的对象
-	l := &nonBlockEtcdLock{
-		client: s.client,
-		key:    s.normalize(key),
-		ttl:    ttl,
-	}
-
-	return l
-}
-
-func (l *nonBlockEtcdLock) NonBlockLock() bool {
-	ctx := context.Background()
-	var op clientv3.OpOption
-	lease, err := l.client.Grant(ctx, int64(l.ttl.Seconds()))
-	if err != nil {
-		return false
-	}
-	op = clientv3.WithLease(lease.ID)
-
-	resp, err := l.client.Txn(ctx).
-		If(clientv3.Compare(clientv3.ModRevision(l.key), "=", 0)).
-		Then(clientv3.OpPut(l.key, "", op)).
-		Else(clientv3.OpGet(l.key)).
-		Commit()
-	if err != nil || !resp.Succeeded {
-		return false
-	}
-
-	return true
-}
-
-func (l *nonBlockEtcdLock) UnNonBlockLock() {
-	l.client.Delete(context.Background(), l.key)
 }
