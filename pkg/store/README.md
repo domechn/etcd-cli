@@ -9,8 +9,8 @@
 package main
 
 import (
-	"github.com/hiruok/gateway/pkg/store/etcd"
-	"github.com/hiruok/gateway/pkg/store"
+	"github.com/domgoer/gateway/pkg/store/etcd"
+	"github.com/domgoer/gateway/pkg/store"
 	"fmt"
 	"time"
 	"context"
@@ -111,7 +111,7 @@ func main() {
  go test -bench=. -benchtime="3s"
  goos: darwin
  goarch: amd64
- pkg: github.com/hiruok/github.com/hiruok/gateway/pkg/store
+ pkg: github.com/domgoer/github.com/domgoer/gateway/pkg/store
  BenchmarkEtcd_Get-4                50000             88290 ns/op
  BenchmarkEtcd_Put-4                 2000           2726530 ns/op
  BenchmarkEtcd_Delete-4              2000           2616983 ns/op
@@ -123,7 +123,7 @@ func main() {
 go test -bench=. -benchtime="10s"
 goos: darwin
 goarch: amd64
-pkg: github.com/hiruok/gateway/pkg/store
+pkg: github.com/domgoer/gateway/pkg/store
 BenchmarkEtcd_Get-4               200000             90198 ns/op
 BenchmarkEtcd_Put-4                 5000           2714720 ns/op
 BenchmarkEtcd_Delete-4              5000           2611590 ns/op

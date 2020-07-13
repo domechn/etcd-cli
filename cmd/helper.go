@@ -16,11 +16,11 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/hiruok/etcd-cli/pkg/stack"
+	"github.com/domgoer/etcd-cli/pkg/stack"
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/json-iterator/go"
+	jsoniter "github.com/json-iterator/go"
 )
 
 var (

@@ -15,7 +15,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hiruok/etcd-cli/pkg/store"
+	"github.com/domgoer/etcd-cli/pkg/store"
 )
 
 // Remove 删除一个文件 如果是文件夹需要在路径最后加上"/""

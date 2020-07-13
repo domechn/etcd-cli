@@ -14,7 +14,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hiruok/etcd-cli/pkg/store"
+	"github.com/domgoer/etcd-cli/pkg/store"
 )
 
 // Mkdir 创建文件夹

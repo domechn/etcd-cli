@@ -15,7 +15,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hiruok/etcd-cli/pkg/store"
+	"github.com/domgoer/etcd-cli/pkg/store"
 )
 
 // Move 源地址，目标地址

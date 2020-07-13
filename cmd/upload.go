@@ -15,7 +15,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hiruok/etcd-cli/pkg/utils"
+	"github.com/domgoer/etcd-cli/pkg/utils"
 )
 
 // Upload 将本地文件以二进制的形式保存到etcd

@@ -13,12 +13,13 @@ package cmd
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/hiruok/etcd-cli/pkg/tls"
-	"github.com/patrickmn/go-cache"
 	"time"
 
-	"github.com/hiruok/etcd-cli/pkg/store"
-	"github.com/hiruok/etcd-cli/pkg/store/etcd"
+	tlsclient "github.com/domgoer/etcd-cli/pkg/tls"
+	"github.com/patrickmn/go-cache"
+
+	"github.com/domgoer/etcd-cli/pkg/store"
+	etcdstore "github.com/domgoer/etcd-cli/pkg/store/etcd"
 )
 
 // Root 获取etcd的客户端

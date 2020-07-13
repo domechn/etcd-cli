@@ -16,7 +16,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hiruok/etcd-cli/pkg/store"
+	"github.com/domgoer/etcd-cli/pkg/store"
 )
 
 var st, _ = New([]string{"localhost:2379"}, nil)

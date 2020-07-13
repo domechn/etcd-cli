@@ -20,7 +20,7 @@ import (
 	"github.com/coreos/etcd/clientv3"
 	"github.com/coreos/etcd/clientv3/concurrency"
 	"github.com/coreos/etcd/mvcc/mvccpb"
-	"github.com/hiruok/etcd-cli/pkg/store"
+	"github.com/domgoer/etcd-cli/pkg/store"
 )
 
 // Etcd implements Store

@@ -53,7 +53,7 @@ etcd-cli -s 127.0.0.1 -p 2380 download /etcd-path/testfile ./
 安装go语言环境
 
 ```bash
-go get github.com/hiruok/etcd-cli
+go get github.com/domgoer/etcd-cli
 cd $GOPATH/bin
 ./etcd-cli
 ```

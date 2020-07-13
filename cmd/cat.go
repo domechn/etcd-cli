@@ -18,7 +18,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/hiruok/etcd-cli/pkg/store"
+	"github.com/domgoer/etcd-cli/pkg/store"
 )
 
 // Cat 获取文件内容

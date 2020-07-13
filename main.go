@@ -12,15 +12,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/peterh/liner"
 	"os"
 	"path"
 	"regexp"
 
-	"github.com/hiruok/etcd-cli/cmd"
+	"github.com/peterh/liner"
 
-	cmd2 "github.com/hiruok/etcd-cli/pkg/cmd"
-	"github.com/hiruok/etcd-cli/pkg/version"
+	"github.com/domgoer/etcd-cli/cmd"
+
+	cmd2 "github.com/domgoer/etcd-cli/pkg/cmd"
+	"github.com/domgoer/etcd-cli/pkg/version"
 	"github.com/spf13/cobra"
 )
 

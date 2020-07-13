@@ -16,7 +16,7 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/hiruok/etcd-cli/pkg/store"
+	"github.com/domgoer/etcd-cli/pkg/store"
 )
 
 // Download 将etcd中的数据下载到本地文件夹

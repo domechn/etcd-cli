@@ -15,7 +15,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hiruok/etcd-cli/pkg/store"
+	"github.com/domgoer/etcd-cli/pkg/store"
 )
 
 // Touch 创建一个文件
